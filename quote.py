@@ -34,7 +34,8 @@ def fmt(q):
     for line in lines:
         out.append(f"{pad}{ITALIC}{line}{RESET}")
     out.append("")
-    link = f"\033]8;;{q['url']}\033\\↗\033]8;;\033\\" if q.get('url') else ""
+    in_tmux = bool(os.environ.get('TMUX'))
+    link = (f"\033]8;;{q['url']}\033\\↗\033]8;;\033\\" if not in_tmux else "↗") if q.get('url') else ""
     out.append(f"{pad}{DIM}— {q['author']}, {ITALIC}{q['title']}{RESET}{DIM}{tag_str}  {link}{RESET}")
     out.append("")
     return '\n'.join(out)
