@@ -34,7 +34,8 @@ def fmt(q):
     for line in lines:
         out.append(f"{pad}{ITALIC}{line}{RESET}")
     out.append("")
-    out.append(f"{pad}{DIM}— {q['author']}, {ITALIC}{q['title']}{RESET}{DIM}{tag_str}{RESET}")
+    link = f"\033]8;;{q['url']}\033\\↗\033]8;;\033\\" if q.get('url') else ""
+    out.append(f"{pad}{DIM}— {q['author']}, {ITALIC}{q['title']}{RESET}{DIM}{tag_str}  {link}{RESET}")
     out.append("")
     return '\n'.join(out)
 
@@ -48,7 +49,8 @@ def fetch_one(cache):
             h = data['results'][0]
             b = get(f'https://readwise.io/api/v2/books/{h["book_id"]}/')
             return {'text': h['text'], 'author': b['author'], 'title': b['title'],
-                    'tags': [t['name'] for t in h.get('tags', [])]}
+                    'tags': [t['name'] for t in h.get('tags', [])],
+                    'url': h.get('readwise_url', '')}
 
 def bg_fetch():
     cache = load_cache()
