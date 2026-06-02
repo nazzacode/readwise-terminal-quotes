@@ -7,7 +7,7 @@ CACHE_FILE = Path.home() / '.cache' / 'readwise_quotes.json'
 COUNT_TTL  = 86400  # 1 day
 
 RESET  = "\033[0m"
-ITALIC = "\033[3m"
+ITALIC = "" if os.environ.get('TMUX') else "\033[3m"
 DIM    = "\033[2m"
 CYAN   = "\033[36m"
 
