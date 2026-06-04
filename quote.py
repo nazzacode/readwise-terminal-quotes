@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import json, os, random, subprocess, sys, textwrap, time, urllib.request
+import json, os, random, shutil, subprocess, sys, textwrap, time, urllib.request
 from pathlib import Path
 
 TOKEN      = os.getenv('READWISE_TOKEN', '')
@@ -27,15 +27,16 @@ def save_cache(cache):
     CACHE_FILE.write_text(json.dumps(cache))
 
 def fmt(q):
-    pad   = "  "
-    lines = textwrap.fill(f'"{q["text"].strip().replace(chr(173), "")}"', width=72 - len(pad)).split('\n')
+    pad      = "  "
+    term_w   = shutil.get_terminal_size(fallback=(80, 24)).columns
+    wrap_w   = min(term_w - len(pad), 80)
+    lines    = textwrap.fill(f'"{q["text"].strip().replace(chr(173), "")}"', width=wrap_w).split('\n')
     tag_str = ("  " + "  ".join(f"{CYAN}#{t}{RESET}{DIM}" for t in q.get('tags', []))) if q.get('tags') else ""
     out = ["\n"]
     for line in lines:
         out.append(f"{pad}{ITALIC}{line}{RESET}")
     out.append("")
-    in_tmux = bool(os.environ.get('TMUX'))
-    link = (f"\033]8;;{q['url']}\033\\↗\033]8;;\033\\" if not in_tmux else "↗") if q.get('url') else ""
+    link = f"\033]8;;{q['url']}\033\\↗\033]8;;\033\\" if q.get('url') else ""
     out.append(f"{pad}{DIM}— {q['author']}, {ITALIC}{q['title']}{RESET}{DIM}{tag_str}  {link}{RESET}")
     out.append("")
     return '\n'.join(out)
